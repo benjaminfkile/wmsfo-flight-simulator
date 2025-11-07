@@ -35,7 +35,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg AWS_REGION=${{ secrets.AWS_REGION }} \
-            --build-arg PORT=4004 \
+            --build-arg PORT=3004 \
             -t $IMAGE_URI:$GIT_SHA \
             -t $IMAGE_URI:latest \
             --push .

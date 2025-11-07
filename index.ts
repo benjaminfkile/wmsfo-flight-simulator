@@ -13,7 +13,7 @@ async function start() {
 
     const server = http.createServer({}, app);
 
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 4004
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 3004
 
     process.on("SIGINT", () => {
       server?.close(() => {
