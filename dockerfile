@@ -25,17 +25,20 @@ RUN npm ci --omit=dev
 # Copy compiled JS
 COPY --from=builder /app/dist ./dist
 
-# ---- Accept required build args ----
+# ---- Build-time args ----
 ARG AWS_REGION
 ARG AWS_SECRET_ARN
 ARG AWS_DB_SECRET_ARN
 ARG NODE_ENVIRONMENT
+ARG GATEWAY_PORT
+ARG PORT
 
-# ---- Expose them as runtime env vars ----
+# ---- Runtime env vars ----
 ENV AWS_REGION=$AWS_REGION
 ENV AWS_SECRET_ARN=$AWS_SECRET_ARN
 ENV AWS_DB_SECRET_ARN=$AWS_DB_SECRET_ARN
 ENV NODE_ENVIRONMENT=$NODE_ENVIRONMENT
+ENV GATEWAY_PORT=$GATEWAY_PORT
 
 EXPOSE 3004
 
