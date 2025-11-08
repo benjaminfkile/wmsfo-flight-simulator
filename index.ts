@@ -10,6 +10,7 @@ import { getDBSecrets } from "./src/aws/getDBDecrets";
 import { isLocal } from "./src/utils/isLocal";
 import cache from "./src/cache";
 import service from "./src/service";
+import cleanup from "./src/cleanup";
 
 process.on("uncaughtException", (err) => {
   console.error(err);
@@ -36,6 +37,8 @@ async function start() {
     service.init();
 
     cache.init();
+
+    cleanup.start()
 
     const port = parseInt(appSecrets.port);
     server = http.createServer({}, app);
