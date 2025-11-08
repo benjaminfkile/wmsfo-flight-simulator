@@ -1,13 +1,20 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
+import cors from "cors";
 import locationRouter from "./routers/locationRouter";
-//import helmet from "helmet";
+import modeRouter from "./routers/modeRouter";
+import { isLocal } from "./utils/isLocal";
 
 const app: Express = express();
+app.use(express.json());
 
-//app.use(morgan("tiny"));
+if (isLocal()) {
+  app.use(morgan("dev"));
+  app.use(cors());
+}
 
 app.use("/", locationRouter);
+app.use("/mode", modeRouter);
 
 app.use(function errorHandler(
   err: Error,

@@ -2,6 +2,7 @@ import { ILocation } from "./interfaces";
 import location from "./db/location";
 import service from "./service";
 import { amILeader } from "./utils/amILeader";
+import { mode } from "./db/mode";
 
 const INTERVAL = 5000;
 
@@ -39,13 +40,18 @@ const cache = {
    */
   async refresh() {
     try {
-      const { isLeader } = await amILeader();
+      const { isLeader, instanceId } = await amILeader();
+
+      const newMode = await mode.getMode();
 
       if (isLeader) {
         // --- Leader behavior: fetch from simulator + write to DB ---
         const data = service.getCurrentLocation();
 
-        await location.insertIfNew(data);
+        await location.insertIfNew(data, instanceId ?? "missing-instance-id");
+
+        this.cachedData = data;
+        this.cachedData.mode = newMode;
 
         console.log("[SantaFlyoverCache] Leader updated cache + DB");
       } else {
@@ -55,6 +61,7 @@ const cache = {
 
         if (latest) {
           this.cachedData = latest;
+          this.cachedData.mode = newMode;
         }
 
         console.log("[SantaFlyoverCache] Follower refreshed cache from DB");

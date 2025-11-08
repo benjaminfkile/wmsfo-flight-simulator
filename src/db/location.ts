@@ -5,27 +5,26 @@ const TABLE = "flight_simulator_gps_location";
 
 const location = {
   /**
-   * Insert a new GPS record if not already present (based on unique index)
+   * Insert a new GPS record if not already present (based on unique time)
    */
-  async insertIfNew(data: ILocation) {
+  async insertIfNew(data: ILocation, instanceId: string) {
     const db = getDb();
 
     const result = await db.raw(
       `
       INSERT INTO ${TABLE} (
         lat, lon, speed, temp, alt, bearing, bearing_raw,
-        mode, time, type, status, redirect, count
+        mode, time, type, status, redirect, count,
+        recorded_at, recorded_by
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT (
-        time
-      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+      ON CONFLICT (time)
       DO NOTHING
       RETURNING id;
       `,
       [
         data.lat,
-        data.lon, 
+        data.lon,
         data.speed ?? null,
         data.temp ?? null,
         data.alt ?? null,
@@ -37,6 +36,7 @@ const location = {
         data.status ?? null,
         data.redirect ?? null,
         data.count ?? null,
+        instanceId,
       ]
     );
 
@@ -50,7 +50,7 @@ const location = {
     const db = getDb();
     const result = await db(TABLE)
       .select("*")
-      .orderBy("time", "desc")
+      .orderBy("recorded_at", "desc")
       .first();
 
     return result ?? null;
